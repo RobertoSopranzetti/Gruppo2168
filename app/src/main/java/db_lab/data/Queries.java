@@ -79,7 +79,7 @@ public final class Queries {
             COMMIT;
             """;
 
-    public static final String COMMENT_INSERTION = """
+    public static final String COMMENT_CREATION = """
             INSERT INTO COMMENTO (dataPubblicazione, Contenuto, IDinserzione, Username)
             VALUES (CURDATE(), ?, ?, ?);
             """;
