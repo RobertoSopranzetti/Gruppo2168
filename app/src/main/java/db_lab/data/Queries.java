@@ -64,8 +64,7 @@ public final class Queries {
             """;
 
     public static final String VOTE_CREATION = """
-            STA
-            RT TRANSACTION;
+            START TRANSACTION;
 
             INSERT INTO Votazione (IDinserzione, Username, Tipo)
             VALUES (?, ?, ?);  -- Tipo TRUE per upvote, FALSE per downvote
@@ -133,7 +132,7 @@ public final class Queries {
 
                 -- Se la categoria è Personaggio, cerca altre inserzioni di Personaggi
                 IF @Categoria = 'Personaggio' THEN
-                    SELECT i.*
+                    SELECT c.*, p.*
                     FROM INSERZIONE i
                     JOIN CREAZIONE c ON i.IDcreazione = c.IDcreazione
                     JOIN PERSONAGGIO p ON c.IDcreazione = p.IDcreazione
@@ -141,7 +140,7 @@ public final class Queries {
 
                 -- Se la categoria è Mostro, cerca altre inserzioni di Mostri
                 ELSEIF @Categoria = 'Mostro' THEN
-                    SELECT i.*
+                    SELECT c.*, m.*
                     FROM INSERZIONE i
                     JOIN CREAZIONE c ON i.IDcreazione = c.IDcreazione
                     JOIN MOSTRO m ON c.IDcreazione = m.IDcreazione
@@ -156,17 +155,6 @@ public final class Queries {
             """;
 
     public static final String SHOW_SUBCATEGORY = """
-            START TRANSACTION;
-
-            SELECT s.Nome AS Sottocategoria, c.*, p.*, m.*
-            FROM INSERZIONE i
-            LEFT JOIN Appartenenza a ON i.IDinserzione = a.IDinserzione
-            LEFT JOIN SOTTOCATEGORIA s ON a.IDsottocategoria = s.IDsottocategoria
-            JOIN CREAZIONE c ON i.IDcreazione = c.IDcreazione
-            LEFT JOIN PERSONAGGIO p ON c.IDcreazione = p.IDcreazione
-            LEFT JOIN MOSTRO m ON c.IDcreazione = m.IDcreazione
-            WHERE i.IDinserzione = ?;
-
             SELECT s.Nome AS Sottocategoria, c.*, p.*, m.*
             FROM CREAZIONE c
             LEFT JOIN PERSONAGGIO p ON c.IDcreazione = p.IDcreazione
@@ -181,17 +169,15 @@ public final class Queries {
             )
             GROUP BY c.IDcreazione, s.Nome
             ORDER BY s.Nome, c.IDcreazione;
-
-            COMMIT;
             """;
     public static final String TOP_CREATORS = """
-            SELECT Username, (UpvoteTotali - DownvoteTotali) AS Voti Totali
+            SELECT Username, (UpvoteTotali - DownvoteTotali) AS VotiTotali
             FROM UTENTE
-            ORDER BY Voti Totali DESC
+            ORDER BY VotiTotali DESC
             LIMIT 10;
             """;
     public static final String TOP_CREATIONS = """
-                        SELECT c.*, p.*, m.*
+            SELECT c.*, p.*, m.*
             FROM CREAZIONE c
             LEFT JOIN PERSONAGGIO p ON c.IDcreazione = p.IDcreazione
             LEFT JOIN MOSTRO m ON c.IDcreazione = m.IDcreazione
@@ -226,7 +212,7 @@ public final class Queries {
 
             UPDATE UTENTE
             SET Segnalato = FALSE
-            WHERE Username = @Username AND Segnalato = TRUE;
+            WHERE Username = ? AND Segnalato = TRUE;
 
             COMMIT;
             """;
