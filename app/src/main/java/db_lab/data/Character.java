@@ -21,7 +21,6 @@ public record Character(
                 Printer.field("intelligence", this.creation.intelligence()),
                 Printer.field("wisdom", this.creation.wisdom()),
                 Printer.field("charisma", this.creation.charisma()),
-                Printer.field("downloads", this.creation.downloads()),
                 Printer.field("classType", this.classType),
                 Printer.field("race", this.race),
                 Printer.field("level", this.level)));
@@ -75,10 +74,5 @@ public record Character(
     @Override
     public int charisma() {
         return creation.charisma();
-    }
-
-    @Override
-    public int downloads() {
-        return creation.downloads();
     }
 }

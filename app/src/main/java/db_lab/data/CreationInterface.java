@@ -13,5 +13,4 @@ public interface CreationInterface {
     int intelligence();
     int wisdom();
     int charisma();
-    int downloads();
 }

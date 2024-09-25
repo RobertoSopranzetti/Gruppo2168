@@ -21,7 +21,6 @@ public record Monster(
                 Printer.field("intelligence", this.creation.intelligence()),
                 Printer.field("wisdom", this.creation.wisdom()),
                 Printer.field("charisma", this.creation.charisma()),
-                Printer.field("downloads", this.creation.downloads()),
                 Printer.field("size", this.size),
                 Printer.field("challengeRating", this.challengeRating),
                 Printer.field("type", this.type)));
@@ -75,10 +74,5 @@ public record Monster(
     @Override
     public int charisma() {
         return creation.charisma();
-    }
-
-    @Override
-    public int downloads() {
-        return creation.downloads();
     }
 }
