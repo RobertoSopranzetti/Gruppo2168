@@ -42,4 +42,20 @@ public final class DAOUtils {
             throw e;
         }
     }
+
+    public static PreparedStatement prepareWithGeneratedKeys(Connection connection, String query, Object... values) throws SQLException {
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+            for (int i = 0; i < values.length; i++) {
+                statement.setObject(i + 1, values[i]);
+            }
+            return statement;
+        } catch (Exception e) {
+            if (statement != null) {
+                statement.close();
+            }
+            throw e;
+        }
+    }
 }
