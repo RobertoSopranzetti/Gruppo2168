@@ -51,11 +51,38 @@ public record Admin() {
         }
 
         public static void userModeration(Connection connection, String adminName, String username, String tipo) {
-            try (PreparedStatement statement = DAOUtils.prepare(connection, Queries.USER_MODERATION, adminName,
-                    username, tipo, username)) {
-                statement.executeUpdate();
+            try {
+                // Inizia una transazione
+                connection.setAutoCommit(false);
+
+                // Inserisci la moderazione
+                try (PreparedStatement statement = DAOUtils.prepare(connection, Queries.USER_MODERATION, adminName,
+                        username, tipo)) {
+                    statement.executeUpdate();
+                }
+
+                // Aggiorna lo stato di segnalazione dell'utente
+                try (PreparedStatement statement = DAOUtils.prepare(connection, Queries.USER_REPORT_UPDATE, username)) {
+                    statement.executeUpdate();
+                }
+
+                // Conferma la transazione
+                connection.commit();
             } catch (SQLException e) {
+                try {
+                    // Annulla la transazione in caso di errore
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
                 e.printStackTrace();
+            } finally {
+                try {
+                    // Ripristina l'auto-commit
+                    connection.setAutoCommit(true);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
@@ -68,9 +95,9 @@ public record Admin() {
             }
         }
 
-        public static void addToSubcategory(Connection connection, int idInserzione, String subcategoryName) {
+        public static void addToSubcategory(Connection connection, int idInserzione, int idSottocategoria) {
             try (PreparedStatement statement = DAOUtils.prepare(connection, Queries.ADD_TO_SUBCATEGORY, idInserzione,
-                    subcategoryName)) {
+                    idSottocategoria)) {
                 statement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
