@@ -38,6 +38,10 @@ public final class Queries {
                         VALUES (CURDATE(), ?, ?, ?);
                         """;
 
+        public static final String SELECT_COLLECTIONS_BY_USERNAME = """
+                        SELECT IDraccolta FROM RACCOLTA WHERE Username = ?;
+                        """;
+
         public static final String DOWNLOAD_CREATION = """
                         INSERT INTO Download (IDinserzione, Username, dataDownload)
                         VALUES (?, ?, CURDATE());
