@@ -11,9 +11,10 @@ public record Admin() {
 
     public final class DAO {
 
-        public static void signUpAdmin(Connection connection, String username, String password, String email) {
+        public static void signUpAdmin(Connection connection, String username, String password, String nome,
+                String cognome, String email) {
             try (PreparedStatement statement = DAOUtils.prepare(connection, Queries.ADMIN_SIGN_UP, username, password,
-                    email)) {
+                    nome, cognome, email)) {
                 statement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
