@@ -1,29 +1,64 @@
 package db_lab.model;
 
-import db_lab.data.Product;
-import db_lab.data.ProductPreview;
 import java.sql.Connection;
 import java.util.List;
-import java.util.Optional;
+
+import db_lab.data.CreationInterface;
+import db_lab.data.User;
 
 public interface Model {
-    public Optional<Product> find(int productCode);
 
-    public List<ProductPreview> previews();
+    // Metodi di Autenticazione
+    boolean authenticate(String username, String password);
 
-    public boolean loadedPreviews();
+    boolean authenticateAdmin(String username, String password);
 
-    public List<ProductPreview> loadPreviews();
+    String getCurrentUsername();
 
-    // Create a mocked version of the model.
-    //
-    public static Model mock() {
-        return new MockedModel();
-    }
+    void setCurrentUsername(String username);
 
-    // Create a model that connects to a database using the given connection.
-    //
-    public static Model fromConnection(Connection connection) {
+    // Metodi di Registrazione
+    boolean registerUser(String username, String password, String firstName, String lastName, String email);
+
+    boolean registerAdmin(String username, String password, String firstName, String lastName, String email);
+
+    // Metodi di Moderazione
+    List<String> getBadUsers();
+
+    List<String> getReportedUsers();
+
+    boolean moderateUser(String adminName, String username, String reason);
+
+    // Metodi di Recupero
+    List<User> getTopCreators();
+
+    List<CreationInterface> getTopListings();
+
+    List<Integer> getCollectionIdsByUsername(String username);
+
+    List<Integer> getAllCreationIds();
+
+    List<Integer> getAllSubcategoryIds();
+
+    // Metodi di Creazione
+    boolean createCollection(String username, String collectionName, boolean isPrivate);
+
+    boolean createMonster(int idCollection, String name, String description, int strength, int dexterity,
+            int constitution, int intelligence, int wisdom, int charisma, String size, int challengeRating, String type,
+            boolean publishImmediately);
+
+    boolean createCharacter(int idCollection, String name, String description, int strength, int dexterity,
+            int constitution, int intelligence, int wisdom, int charisma, String classType, String race, int level,
+            boolean publishImmediately);
+
+    boolean createSubcategory(String adminName, String subcategoryName, String subcategoryDescription);
+
+    // Metodi di Associazione
+    boolean associateCreationToSubcategory(int creationId, int subcategoryId);
+
+    // Creazione del modello da una connessione al database
+    static Model fromConnection(Connection connection) {
         return new DBModel(connection);
     }
+
 }
