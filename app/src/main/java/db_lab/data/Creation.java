@@ -53,64 +53,18 @@ public record Creation(
                 connection.setAutoCommit(false); // Inizia la transazione
 
                 // Determina la categoria dell'inserzione
-                try (PreparedStatement statement = connection.prepareStatement(Queries.DETERMINE_CATEGORY)) {
-                    statement.setInt(1, idCreation);
-                    try (ResultSet resultSet = statement.executeQuery()) {
-                        if (resultSet.next()) {
-                            category = resultSet.getString("Categoria");
-                        }
+                try (PreparedStatement statement = DAOUtils.prepare(connection, Queries.DETERMINE_CATEGORY, idCreation);
+                        ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        category = resultSet.getString("Categoria");
                     }
                 }
 
                 // Cerca altre inserzioni simili
                 if ("Personaggio".equals(category)) {
-                    try (PreparedStatement statement = connection.prepareStatement(Queries.GET_OTHER_CHARACTERS)) {
-                        statement.setInt(1, idCreation);
-                        try (ResultSet resultSet = statement.executeQuery()) {
-                            while (resultSet.next()) {
-                                int id = resultSet.getInt("IDcreazione");
-                                Date creationDate = resultSet.getDate("dataCreazione");
-                                String name = resultSet.getString("Nome");
-                                String description = resultSet.getString("Descrizione");
-                                int strength = resultSet.getInt("Forza");
-                                int dexterity = resultSet.getInt("Destrezza");
-                                int constitution = resultSet.getInt("Costituzione");
-                                int intelligence = resultSet.getInt("Intelligenza");
-                                int wisdom = resultSet.getInt("Saggezza");
-                                int charisma = resultSet.getInt("Carisma");
-                                String classType = resultSet.getString("Classe");
-                                String race = resultSet.getString("Razza");
-                                int level = resultSet.getInt("Livello");
-                                Creation creation = new Creation(id, creationDate, name, description, strength,
-                                        dexterity, constitution, intelligence, wisdom, charisma);
-                                relatedCreations.add(new Character(creation, classType, race, level));
-                            }
-                        }
-                    }
+                    relatedCreations.addAll(getCreations(connection, Queries.GET_OTHER_CHARACTERS, idCreation));
                 } else if ("Mostro".equals(category)) {
-                    try (PreparedStatement statement = connection.prepareStatement(Queries.GET_OTHER_MONSTERS)) {
-                        statement.setInt(1, idCreation);
-                        try (ResultSet resultSet = statement.executeQuery()) {
-                            while (resultSet.next()) {
-                                int id = resultSet.getInt("IDcreazione");
-                                Date creationDate = resultSet.getDate("dataCreazione");
-                                String name = resultSet.getString("Nome");
-                                String description = resultSet.getString("Descrizione");
-                                int strength = resultSet.getInt("Forza");
-                                int dexterity = resultSet.getInt("Destrezza");
-                                int constitution = resultSet.getInt("Costituzione");
-                                int intelligence = resultSet.getInt("Intelligenza");
-                                int wisdom = resultSet.getInt("Saggezza");
-                                int charisma = resultSet.getInt("Carisma");
-                                String size = resultSet.getString("Taglia");
-                                int challengeRating = resultSet.getInt("GradoSfida");
-                                String type = resultSet.getString("Tipo");
-                                Creation creation = new Creation(id, creationDate, name, description, strength,
-                                        dexterity, constitution, intelligence, wisdom, charisma);
-                                relatedCreations.add(new Monster(creation, size, challengeRating, type));
-                            }
-                        }
-                    }
+                    relatedCreations.addAll(getCreations(connection, Queries.GET_OTHER_MONSTERS, idCreation));
                 }
 
                 connection.commit(); // Commit della transazione
@@ -132,80 +86,93 @@ public record Creation(
             return relatedCreations;
         }
 
-        public static List<CreationInterface> topCreations(Connection connection) {
-            List<CreationInterface> result = new ArrayList<>();
-            String query = Queries.TOP_CREATIONS;
+        public static List<CreationInterface> getSubcategory(Connection connection, int inserzioneId) {
+            return getCreations(connection, Queries.SHOW_SUBCATEGORY, inserzioneId);
+        }
 
-            try (PreparedStatement statement = connection.prepareStatement(query);
+        public static List<CreationInterface> topCreations(Connection connection) {
+            return getCreations(connection, Queries.TOP_CREATIONS);
+        }
+
+        private static List<CreationInterface> getCreations(Connection connection, String query, Object... params) {
+            List<CreationInterface> creations = new ArrayList<>();
+
+            try (PreparedStatement statement = DAOUtils.prepare(connection, query, params);
                     ResultSet resultSet = statement.executeQuery()) {
 
                 while (resultSet.next()) {
-                    int id = resultSet.getInt("IDcreazione");
-                    Date creationDate = resultSet.getDate("dataCreazione");
-                    String name = resultSet.getString("Nome");
-                    String description = resultSet.getString("Descrizione");
-                    int strength = resultSet.getInt("Forza");
-                    int dexterity = resultSet.getInt("Destrezza");
-                    int constitution = resultSet.getInt("Costituzione");
-                    int intelligence = resultSet.getInt("Intelligenza");
-                    int wisdom = resultSet.getInt("Saggezza");
-                    int charisma = resultSet.getInt("Carisma");
-
-                    if (resultSet.getInt("p.IDcreazione") != 0) {
-                        // È un personaggio
-                        String classType = resultSet.getString("Classe");
-                        String race = resultSet.getString("Razza");
-                        int level = resultSet.getInt("Livello");
-                        Creation creation = new Creation(id, creationDate, name, description, strength, dexterity,
-                                constitution, intelligence, wisdom, charisma);
-                        result.add(new Character(creation, classType, race, level));
-                    } else if (resultSet.getInt("m.IDcreazione") != 0) {
-                        // È un mostro
-                        String size = resultSet.getString("Taglia");
-                        int challengeRating = resultSet.getInt("GradoSfida");
-                        String type = resultSet.getString("Tipo");
-                        Creation creation = new Creation(id, creationDate, name, description, strength, dexterity,
-                                constitution, intelligence, wisdom, charisma);
-                        result.add(new Monster(creation, size, challengeRating, type));
-                    }
+                    Creation creation = createCreation(resultSet);
+                    creations.add(createCreationInterface(resultSet, creation));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
 
-            return result;
+            return creations;
         }
-    }
 
-    public static void downloadCreation(Connection connection, int idInserzione, String username) {
-        try {
-            connection.setAutoCommit(false);
+        private static Creation createCreation(ResultSet resultSet) throws SQLException {
+            int id = resultSet.getInt("IDcreazione");
+            Date creationDate = resultSet.getDate("dataCreazione");
+            String name = resultSet.getString("Nome");
+            String description = resultSet.getString("Descrizione");
+            int strength = resultSet.getInt("Forza");
+            int dexterity = resultSet.getInt("Destrezza");
+            int constitution = resultSet.getInt("Costituzione");
+            int intelligence = resultSet.getInt("Intelligenza");
+            int wisdom = resultSet.getInt("Saggezza");
+            int charisma = resultSet.getInt("Carisma");
 
-            // Inserimento nella tabella Download
-            try (PreparedStatement downloadStatement = DAOUtils.prepare(connection, Queries.DOWNLOAD_CREATION,
-                    idInserzione, username)) {
-                downloadStatement.executeUpdate();
+            return new Creation(id, creationDate, name, description, strength, dexterity, constitution, intelligence,
+                    wisdom, charisma);
+        }
+
+        private static CreationInterface createCreationInterface(ResultSet resultSet, Creation creation)
+                throws SQLException {
+            if (resultSet.getInt("p.IDcreazione") != 0) {
+                String classType = resultSet.getString("Classe");
+                String race = resultSet.getString("Razza");
+                int level = resultSet.getInt("Livello");
+                return new Character(creation, classType, race, level);
+            } else if (resultSet.getInt("m.IDcreazione") != 0) {
+                String size = resultSet.getString("Taglia");
+                int challengeRating = resultSet.getInt("GradoSfida");
+                String type = resultSet.getString("Tipo");
+                return new Monster(creation, size, challengeRating, type);
             }
+            return null;
+        }
 
-            // Aggiornamento del numero di download nella tabella INSERZIONE
-            try (PreparedStatement updateStatement = DAOUtils.prepare(connection, Queries.UPDATE_TOTAL_DOWNLOADS,
-                    idInserzione)) {
-                updateStatement.executeUpdate();
-            }
-
-            connection.commit();
-        } catch (SQLException e) {
+        public static void downloadCreation(Connection connection, int idInserzione, String username) {
             try {
-                connection.rollback();
-            } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
-            }
-            e.printStackTrace();
-        } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException autoCommitEx) {
-                autoCommitEx.printStackTrace();
+                connection.setAutoCommit(false);
+
+                // Inserimento nella tabella Download
+                try (PreparedStatement downloadStatement = DAOUtils.prepare(connection, Queries.DOWNLOAD_CREATION,
+                        idInserzione, username)) {
+                    downloadStatement.executeUpdate();
+                }
+
+                // Aggiornamento del numero di download nella tabella INSERZIONE
+                try (PreparedStatement updateStatement = DAOUtils.prepare(connection, Queries.UPDATE_TOTAL_DOWNLOADS,
+                        idInserzione)) {
+                    updateStatement.executeUpdate();
+                }
+
+                connection.commit();
+            } catch (SQLException e) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+                e.printStackTrace();
+            } finally {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException autoCommitEx) {
+                    autoCommitEx.printStackTrace();
+                }
             }
         }
     }
