@@ -168,17 +168,16 @@ public record User(
             return result;
         }
 
-        public static void createCharacter(Connection connection, String nome, String descrizione, int forza,
+        public static int createCharacter(Connection connection, String nome, String descrizione, int forza,
                 int destrezza, int costituzione, int intelligenza, int saggezza, int carisma, int idRaccolta,
-                String classe,
-                String razza, int livello) {
+                String classe, String razza, int livello) {
             try {
                 connection.setAutoCommit(false);
 
                 // Inserimento nella tabella CREAZIONE
                 try (PreparedStatement creationStatement = DAOUtils.prepareWithGeneratedKeys(connection,
-                        Queries.CREATION_INSERT, nome,
-                        descrizione, forza, destrezza, costituzione, intelligenza, saggezza, carisma, idRaccolta)) {
+                        Queries.CREATION_INSERT, nome, descrizione, forza, destrezza, costituzione, intelligenza,
+                        saggezza, carisma, idRaccolta)) {
                     creationStatement.executeUpdate();
 
                     // Ottenere l'ID generato per la creazione
@@ -191,13 +190,14 @@ public record User(
                                     Queries.CHARACTER_CREATION, idCreazione, classe, razza, livello)) {
                                 characterStatement.executeUpdate();
                             }
+
+                            connection.commit();
+                            return idCreazione; // Restituisce l'ID della creazione
                         } else {
                             throw new SQLException("Creazione ID non ottenuto.");
                         }
                     }
                 }
-
-                connection.commit();
             } catch (SQLException e) {
                 try {
                     connection.rollback();
@@ -205,6 +205,7 @@ public record User(
                     rollbackEx.printStackTrace();
                 }
                 e.printStackTrace();
+                return -1; // Indica un errore
             } finally {
                 try {
                     connection.setAutoCommit(true);
@@ -214,10 +215,9 @@ public record User(
             }
         }
 
-        public static void createMonster(Connection connection, String nome, String descrizione, int forza,
+        public static int createMonster(Connection connection, String nome, String descrizione, int forza,
                 int destrezza, int costituzione, int intelligenza, int saggezza, int carisma, int idRaccolta,
-                String taglia,
-                int difficolta, String tipo) {
+                String taglia, int difficolta, String tipo) {
             try {
                 connection.setAutoCommit(false);
 
@@ -237,13 +237,14 @@ public record User(
                                     Queries.MONSTER_CREATION, idCreazione, taglia, difficolta, tipo)) {
                                 monsterStatement.executeUpdate();
                             }
+
+                            connection.commit();
+                            return idCreazione; // Restituisce l'ID della creazione
                         } else {
                             throw new SQLException("Creazione ID non ottenuto.");
                         }
                     }
                 }
-
-                connection.commit();
             } catch (SQLException e) {
                 try {
                     connection.rollback();
@@ -251,6 +252,7 @@ public record User(
                     rollbackEx.printStackTrace();
                 }
                 e.printStackTrace();
+                return -1; // Indica un errore
             } finally {
                 try {
                     connection.setAutoCommit(true);
@@ -260,5 +262,20 @@ public record User(
             }
         }
 
+        public static List<Integer> getCollectionIdsByUsername(Connection connection, String username) {
+            List<Integer> collectionIds = new ArrayList<>();
+            String query = Queries.SELECT_COLLECTIONS_BY_USERNAME;
+
+            try (PreparedStatement statement = DAOUtils.prepare(connection, query, username);
+                    ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    collectionIds.add(resultSet.getInt("IDraccolta"));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return collectionIds;
+        }
     }
 }
