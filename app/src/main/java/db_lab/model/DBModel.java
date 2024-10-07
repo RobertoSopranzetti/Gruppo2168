@@ -15,14 +15,6 @@ import db_lab.data.DAOException;
 import db_lab.data.DAOUtils;
 import db_lab.data.User;
 
-// This is the real model implementation that uses the DAOs we've defined to
-// actually load data from the underlying database.
-//
-// As you can see this model doesn't do too much except loading data from the
-// database and keeping a cache of the loaded previews.
-// A real model might be doing much more, but for the sake of the example we're
-// keeping it simple.
-//
 public final class DBModel implements Model {
 
     private final Connection connection;
@@ -35,14 +27,30 @@ public final class DBModel implements Model {
 
     @Override
     public boolean authenticate(String username, String password) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'authenticate'");
+        String query = "SELECT COUNT(*) FROM UTENTE WHERE Username = ? AND Password = ?";
+        try (PreparedStatement statement = DAOUtils.prepare(connection, query, username, password);
+                ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public boolean authenticateAdmin(String username, String password) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'authenticateAdmin'");
+        String query = "SELECT COUNT(*) FROM ADMIN WHERE Username = ? AND Password = ?";
+        try (PreparedStatement statement = DAOUtils.prepare(connection, query, username, password);
+                ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -151,6 +159,26 @@ public final class DBModel implements Model {
     }
 
     @Override
+    public List<Integer> getAllCommentIds() {
+        List<Integer> commentIds = new ArrayList<>();
+        String query = """
+                SELECT IDcommento
+                FROM Commenti
+                """;
+
+        try (PreparedStatement statement = DAOUtils.prepare(connection, query);
+                ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                commentIds.add(resultSet.getInt("IDcommento"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return commentIds;
+    }
+
+    @Override
     public boolean createCollection(String username, String collectionName, boolean isPrivate) {
         try {
             User.DAO.createCollection(connection, username, isPrivate, collectionName);
@@ -191,6 +219,50 @@ public final class DBModel implements Model {
     }
 
     @Override
+    public boolean voteCreation(int idInserzione, String username, boolean tipo) {
+        try {
+            User.DAO.voteCreation(connection, idInserzione, username, tipo);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean commentCreation(int idInserzione, String username, String commento) {
+        try {
+            User.DAO.commentCreation(connection, idInserzione, username, commento);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean reportInsertion(int idInserzione, String username, String motivo) {
+        try {
+            User.DAO.reportInsertion(connection, idInserzione, username, motivo);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean reportComment(int idCommento, String username, String motivo) {
+        try {
+            User.DAO.reportComment(connection, idCommento, username, motivo);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
     public boolean createSubcategory(String adminName, String subcategoryName, String subcategoryDescription) {
         try {
             Admin.DAO.addSubcategory(connection, subcategoryName, subcategoryDescription, adminName);
@@ -207,6 +279,27 @@ public final class DBModel implements Model {
             return true;
         } catch (Exception e) {
             throw new DAOException("Failed to associate creation to subcategory", e);
+        }
+    }
+
+    @Override
+    public List<CreationInterface> getCategory(int idCreation) {
+        return Creation.DAO.getCategory(connection, idCreation);
+    }
+
+    @Override
+    public List<CreationInterface> getSubcategory(int inserzioneId) {
+        return Creation.DAO.getSubcategory(connection, inserzioneId);
+    }
+
+    @Override
+    public boolean downloadCreation(int idInserzione, String username) {
+        try {
+            Creation.DAO.downloadCreation(connection, idInserzione, username);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

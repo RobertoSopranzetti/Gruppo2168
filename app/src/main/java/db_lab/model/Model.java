@@ -40,6 +40,12 @@ public interface Model {
 
     List<Integer> getAllSubcategoryIds();
 
+    List<CreationInterface> getCategory(int idCreation);
+
+    List<CreationInterface> getSubcategory(int inserzioneId);
+
+    List<Integer> getAllCommentIds();
+
     // Metodi di Creazione
     boolean createCollection(String username, String collectionName, boolean isPrivate);
 
@@ -54,6 +60,18 @@ public interface Model {
     boolean createSubcategory(String adminName, String subcategoryName, String subcategoryDescription);
 
     boolean publishCreation(int creationId, String username);
+
+    // Metodi di Votazione, Commento e Segnalazione
+
+    boolean voteCreation(int idInserzione, String username, boolean tipo);
+
+    boolean downloadCreation(int idInserzione, String username);
+
+    boolean commentCreation(int idInserzione, String username, String commento);
+
+    boolean reportInsertion(int idInserzione, String username, String motivo);
+
+    boolean reportComment(int idCommento, String username, String motivo);
 
     // Metodi di Associazione
     boolean associateCreationToSubcategory(int creationId, int subcategoryId);
