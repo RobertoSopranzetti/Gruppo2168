@@ -246,4 +246,87 @@ public final class Controller {
     public List<Integer> getAllSubcategoryIds() {
         return model.getAllSubcategoryIds();
     }
+
+    public void userNavigateVote(String username) {
+        view.showVotePage(username);
+    }
+
+    public void userNavigateComment(String username) {
+        view.showCommentPage(username);
+    }
+
+    public void userNavigateReportInsertion(String username) {
+        view.showReportInsertionPage(username);
+    }
+
+    public void userNavigateReportComment(String username) {
+        view.showReportCommentPage(username);
+    }
+
+    public void userNavigateDownload(String username) {
+        view.showDownloadPage(username);
+    }
+
+    public void userClickedViewCategory() {
+        view.showCategoryPage();
+    }
+
+    public void userClickedViewSubcategory() {
+        view.showSubcategoryPage();
+    }
+
+    public void voteInsertion(Integer selectedId, String username, boolean b) {
+        if (model.voteCreation(selectedId, username, b)) {
+            this.userClickedBack();
+        } else {
+            view.showUserError("Failed to vote on insertion");
+        }
+    }
+
+    public void commentInsertion(Integer selectedId, String username, String comment) {
+        if (model.commentCreation(selectedId, username, comment)) {
+            this.userClickedBack();
+        } else {
+            view.showUserError("Failed to comment on insertion");
+        }
+    }
+
+    public void reportInsertion(Integer selectedId, String username, String reason) {
+        if (model.reportInsertion(selectedId, username, reason)) {
+            this.userClickedBack();
+        } else {
+            view.showUserError("Failed to report insertion");
+        }
+    }
+
+    public List<Integer> getAllCommentIds() {
+        return model.getAllCommentIds();
+    }
+
+    public void reportComment(Integer selectedId, String username, String reason) {
+        if (model.reportComment(selectedId, username, reason)) {
+            this.userClickedBack();
+        } else {
+            view.showUserError("Failed to report comment");
+        }
+    }
+
+    public void downloadInsertion(Integer selectedId, String username) {
+        if (model.downloadCreation(selectedId, username)) {
+            this.userClickedBack();
+        } else {
+            view.showUserError("Failed to download insertion");
+        }
+    }
+
+    public void handleViewCategory(Integer selectedId) {
+        List<CreationInterface> category = model.getCategory(selectedId);
+        view.showCategories(category);
+    }
+
+    public void handleViewSubcategory(Integer selectedId) {
+        List<CreationInterface> subcategory = model.getSubcategory(selectedId);
+        view.showSubcategories(subcategory);
+    }
+
 }
