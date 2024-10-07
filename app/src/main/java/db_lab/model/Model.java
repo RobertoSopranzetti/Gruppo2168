@@ -43,15 +43,17 @@ public interface Model {
     // Metodi di Creazione
     boolean createCollection(String username, String collectionName, boolean isPrivate);
 
-    boolean createMonster(int idCollection, String name, String description, int strength, int dexterity,
-            int constitution, int intelligence, int wisdom, int charisma, String size, int challengeRating, String type,
-            boolean publishImmediately);
+    int createMonster(String name, String description, int strength, int dexterity,
+            int constitution, int intelligence, int wisdom, int charisma, int idCollection, String size,
+            int challengeRating, String type);
 
-    boolean createCharacter(int idCollection, String name, String description, int strength, int dexterity,
-            int constitution, int intelligence, int wisdom, int charisma, String classType, String race, int level,
-            boolean publishImmediately);
+    int createCharacter(String name, String description, int strength, int dexterity,
+            int constitution, int intelligence, int wisdom, int charisma, int idCollection, String classType,
+            String race, int level);
 
     boolean createSubcategory(String adminName, String subcategoryName, String subcategoryDescription);
+
+    boolean publishCreation(int creationId, String username);
 
     // Metodi di Associazione
     boolean associateCreationToSubcategory(int creationId, int subcategoryId);

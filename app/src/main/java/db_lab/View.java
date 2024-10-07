@@ -296,14 +296,14 @@ public final class View {
                 panel.add(Box.createVerticalStrut(10));
                 JButton characterButton = button("Crea Personaggio", () -> {
                     int idCollection = (int) idCollectionComboBox.getSelectedItem();
-                    this.getController().userSelectedCreationType(idCollection, false);
+                    this.getController().userSelectedCreationType(idCollection, false, username);
                 });
                 panel.add(characterButton);
 
                 panel.add(Box.createVerticalStrut(10));
                 JButton monsterButton = button("Crea Mostro", () -> {
                     int idCollection = (int) idCollectionComboBox.getSelectedItem();
-                    this.getController().userSelectedCreationType(idCollection, true);
+                    this.getController().userSelectedCreationType(idCollection, true, username);
                 });
                 panel.add(monsterButton);
 
@@ -318,7 +318,7 @@ public final class View {
         });
     }
 
-    public void showCreateCharacterOrMonsterPage(int idCollection, boolean isMonster) {
+    public void showCreateCharacterOrMonsterPage(int idCollection, boolean isMonster, String username) {
         freshPane(cp -> {
             cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
@@ -390,14 +390,14 @@ public final class View {
                         String type = monsterTypeField.getText();
                         this.getController().userClickedCreateMonster(idCollection, name, description, strength,
                                 dexterity, constitution, intelligence, wisdom, charisma, size, challengeRating, type,
-                                publishImmediately);
+                                publishImmediately, username);
                     } else {
                         String classType = classTypeField.getText();
                         String race = raceField.getText();
                         int level = Integer.parseInt(levelField.getText());
                         this.getController().userClickedCreateCharacter(idCollection, name, description, strength,
                                 dexterity, constitution, intelligence, wisdom, charisma, classType, race, level,
-                                publishImmediately);
+                                publishImmediately, username);
                     }
                 });
                 panel.add(createButton);

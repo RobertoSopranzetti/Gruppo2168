@@ -147,16 +147,25 @@ public final class Controller {
         view.showInitialCreatePage(username);
     }
 
-    public void userSelectedCreationType(int idCollection, boolean isMonster) {
-        view.showCreateCharacterOrMonsterPage(idCollection, isMonster);
+    public void userSelectedCreationType(int idCollection, boolean isMonster, String username) {
+        view.showCreateCharacterOrMonsterPage(idCollection, isMonster, username);
     }
 
     public void userClickedCreateMonster(int idCollection, String name, String description, int strength, int dexterity,
             int constitution, int intelligence, int wisdom, int charisma, String size, int challengeRating,
-            String type, boolean publishImmediately) {
-        if (model.createMonster(idCollection, name, description, strength, dexterity, constitution, intelligence,
-                wisdom, charisma, size, challengeRating, type, publishImmediately)) {
-            this.userClickedBack();
+            String type, boolean publishImmediately, String username) {
+        int creationId = model.createMonster(name, description, strength, dexterity, constitution, intelligence,
+                wisdom, charisma, idCollection, size, challengeRating, type);
+        if (creationId > 0) {
+            if (publishImmediately) {
+                if (model.publishCreation(creationId, username)) {
+                    this.userClickedBack();
+                } else {
+                    view.showUserError("Failed to publish monster");
+                }
+            } else {
+                this.userClickedBack();
+            }
         } else {
             view.showUserError("Failed to create monster");
         }
@@ -164,10 +173,19 @@ public final class Controller {
 
     public void userClickedCreateCharacter(int idCollection, String name, String description, int strength,
             int dexterity, int constitution, int intelligence, int wisdom, int charisma, String classType, String race,
-            int level, boolean publishImmediately) {
-        if (model.createCharacter(idCollection, name, description, strength, dexterity, constitution, intelligence,
-                wisdom, charisma, classType, race, level, publishImmediately)) {
-            this.userClickedBack();
+            int level, boolean publishImmediately, String username) {
+        int creationId = model.createCharacter(name, description, strength, dexterity, constitution, intelligence,
+                wisdom, charisma, idCollection, classType, race, level);
+        if (creationId > 0) {
+            if (publishImmediately) {
+                if (model.publishCreation(creationId, username)) {
+                    this.userClickedBack();
+                } else {
+                    view.showUserError("Failed to publish character");
+                }
+            } else {
+                this.userClickedBack();
+            }
         } else {
             view.showUserError("Failed to create character");
         }
