@@ -726,14 +726,14 @@ public final class View {
     public void showCategories(List<CreationInterface> categories) {
         freshPane(cp -> {
             cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-    
+
             // Creazione del pannello principale
             JPanel mainPanel = new JPanel();
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-    
+
             mainPanel.add(new JLabel("Categorie:", SwingConstants.CENTER));
             mainPanel.add(Box.createVerticalStrut(10)); // Spazio tra i campi
-    
+
             for (CreationInterface creation : categories) {
                 mainPanel.add(new JLabel("Nome: " + creation.name()));
                 mainPanel.add(new JLabel("Descrizione: " + creation.description()));
@@ -756,16 +756,16 @@ public final class View {
 
                 mainPanel.add(Box.createVerticalStrut(10)); // Spazio tra le creazioni
             }
-    
+
             mainPanel.add(Box.createVerticalStrut(20)); // Spazio prima del pulsante
             JButton backButton = button("Back", () -> this.getController().userClickedBack());
             mainPanel.add(backButton);
-    
+
             // Creazione di un JScrollPane per rendere il pannello scorrevole
             JScrollPane scrollPane = new JScrollPane(mainPanel);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    
+
             // Aggiunta dello JScrollPane al contenitore principale
             cp.add(scrollPane);
         });
@@ -774,14 +774,14 @@ public final class View {
     public void showSubcategories(List<CreationInterface> subcategories) {
         freshPane(cp -> {
             cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-    
+
             // Creazione del pannello principale
             JPanel mainPanel = new JPanel();
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-    
+
             mainPanel.add(new JLabel("Sottocategorie:", SwingConstants.CENTER));
             mainPanel.add(Box.createVerticalStrut(10)); // Spazio tra i campi
-    
+
             for (CreationInterface creation : subcategories) {
                 mainPanel.add(new JLabel("Nome: " + creation.name()));
                 mainPanel.add(new JLabel("Descrizione: " + creation.description()));
@@ -804,16 +804,16 @@ public final class View {
 
                 mainPanel.add(Box.createVerticalStrut(10)); // Spazio tra le creazioni
             }
-    
+
             mainPanel.add(Box.createVerticalStrut(20)); // Spazio prima del pulsante
             JButton backButton = button("Back", () -> this.getController().userClickedBack());
             mainPanel.add(backButton);
-    
+
             // Creazione di un JScrollPane per rendere il pannello scorrevole
             JScrollPane scrollPane = new JScrollPane(mainPanel);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    
+
             // Aggiunta dello JScrollPane al contenitore principale
             cp.add(scrollPane);
         });
@@ -864,7 +864,7 @@ public final class View {
                 Integer selectedId = (Integer) insertionIdComboBox.getSelectedItem();
                 if (selectedId != null) {
                     getController().voteInsertion(selectedId, username, true);
-                    this.getController().loadInitialPage();
+                    this.getController().userClickedBack();
                 } else {
                     JOptionPane.showMessageDialog(cp, "Seleziona un'inserzione.");
                 }
@@ -875,14 +875,14 @@ public final class View {
                 Integer selectedId = (Integer) insertionIdComboBox.getSelectedItem();
                 if (selectedId != null) {
                     getController().voteInsertion(selectedId, username, false);
-                    this.getController().loadInitialPage();
+                    this.getController().userClickedBack();
                 } else {
                     JOptionPane.showMessageDialog(cp, "Seleziona un'inserzione.");
                 }
             });
             cp.add(downvoteButton);
 
-            JButton backButton = button("Back", () -> this.getController().loadInitialPage());
+            JButton backButton = button("Back", () -> this.getController().userClickedBack());
             cp.add(backButton);
 
             cp.add(Box.createVerticalGlue());
@@ -908,14 +908,14 @@ public final class View {
                 String comment = commentArea.getText();
                 if (selectedId != null && !comment.isEmpty()) {
                     getController().commentInsertion(selectedId, username, comment);
-                    this.getController().loadInitialPage();
+                    this.getController().userClickedBack();
                 } else {
                     JOptionPane.showMessageDialog(cp, "Seleziona un'inserzione e inserisci un commento.");
                 }
             });
             cp.add(commentButton);
 
-            JButton backButton = button("Back", () -> this.getController().loadInitialPage());
+            JButton backButton = button("Back", () -> this.getController().userClickedBack());
             cp.add(backButton);
 
             cp.add(Box.createVerticalGlue());
@@ -941,14 +941,14 @@ public final class View {
                 String reason = reasonArea.getText();
                 if (selectedId != null && !reason.isEmpty()) {
                     getController().reportInsertion(selectedId, username, reason);
-                    this.getController().loadInitialPage();
+                    this.getController().userClickedBack();
                 } else {
                     JOptionPane.showMessageDialog(cp, "Seleziona un'inserzione e inserisci un motivo.");
                 }
             });
             cp.add(reportButton);
 
-            JButton backButton = button("Back", () -> this.getController().loadInitialPage());
+            JButton backButton = button("Back", () -> this.getController().userClickedBack());
             cp.add(backButton);
 
             cp.add(Box.createVerticalGlue());
@@ -979,14 +979,14 @@ public final class View {
                 String reason = reasonArea.getText();
                 if (selectedId != null && !reason.isEmpty()) {
                     getController().reportComment(selectedId, username, reason);
-                    this.getController().loadInitialPage();
+                    this.getController().userClickedBack();
                 } else {
                     JOptionPane.showMessageDialog(cp, "Seleziona un commento e inserisci un motivo.");
                 }
             });
             cp.add(reportButton);
 
-            JButton backButton = button("Back", () -> this.getController().loadInitialPage());
+            JButton backButton = button("Back", () -> this.getController().userClickedBack());
             cp.add(backButton);
 
             cp.add(Box.createVerticalGlue());
@@ -1008,14 +1008,14 @@ public final class View {
                 Integer selectedId = (Integer) insertionIdComboBox.getSelectedItem();
                 if (selectedId != null) {
                     getController().downloadInsertion(selectedId, username);
-                    this.getController().loadInitialPage();
+                    this.getController().userClickedBack();
                 } else {
                     JOptionPane.showMessageDialog(cp, "Seleziona un'inserzione.");
                 }
             });
             cp.add(downloadButton);
 
-            JButton backButton = button("Back", () -> this.getController().loadInitialPage());
+            JButton backButton = button("Back", () -> this.getController().userClickedBack());
             cp.add(backButton);
 
             cp.add(Box.createVerticalGlue());
@@ -1043,7 +1043,7 @@ public final class View {
             });
             cp.add(viewCategoryButton);
 
-            JButton backButton = button("Back", () -> this.getController().loadInitialPage());
+            JButton backButton = button("Back", () -> this.getController().userClickedBack());
             cp.add(backButton);
 
             cp.add(Box.createVerticalGlue());
@@ -1071,7 +1071,7 @@ public final class View {
             });
             cp.add(viewSubcategoryButton);
 
-            JButton backButton = button("Back", () -> this.getController().loadInitialPage());
+            JButton backButton = button("Back", () -> this.getController().userClickedBack());
             cp.add(backButton);
 
             cp.add(Box.createVerticalGlue());
