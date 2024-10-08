@@ -129,7 +129,7 @@ public final class DBModel implements Model {
         try (PreparedStatement statement = DAOUtils.prepare(connection, query);
                 ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                creationIds.add(resultSet.getInt("IDcreazione"));
+                creationIds.add(resultSet.getInt("IDinserzione"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -149,7 +149,7 @@ public final class DBModel implements Model {
         try (PreparedStatement statement = DAOUtils.prepare(connection, query);
                 ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                subcategoryIds.add(resultSet.getInt("IDsubcategoria"));
+                subcategoryIds.add(resultSet.getInt("IDsottocategoria"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
