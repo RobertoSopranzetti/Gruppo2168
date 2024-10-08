@@ -163,7 +163,7 @@ public final class DBModel implements Model {
         List<Integer> commentIds = new ArrayList<>();
         String query = """
                 SELECT IDcommento
-                FROM Commenti
+                FROM COMMENTO
                 """;
 
         try (PreparedStatement statement = DAOUtils.prepare(connection, query);
