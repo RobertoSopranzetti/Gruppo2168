@@ -181,7 +181,7 @@ public final class DBModel implements Model {
     @Override
     public boolean createCollection(String username, String collectionName, boolean isPrivate) {
         try {
-            User.DAO.createCollection(connection, username, isPrivate, collectionName);
+            User.DAO.createCollection(connection, collectionName, isPrivate, username);
             return true;
         } catch (Exception e) {
             throw new DAOException("Failed to create collection", e);
