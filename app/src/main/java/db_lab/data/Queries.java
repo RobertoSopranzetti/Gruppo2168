@@ -34,7 +34,7 @@ public final class Queries {
                         """;
 
         public static final String CREATE_COLLECTION = """
-                        INSERT INTO RACCOLTA (dataCreazone, Nome, Privata, Username)
+                        INSERT INTO RACCOLTA (dataCreazione, Nome, Privata, Username)
                         VALUES (CURDATE(), ?, ?, ?);
                         """;
 
