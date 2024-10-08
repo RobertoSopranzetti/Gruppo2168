@@ -122,8 +122,8 @@ public final class DBModel implements Model {
     public List<Integer> getAllCreationIds() {
         List<Integer> creationIds = new ArrayList<>();
         String query = """
-                SELECT IDcreazione
-                FROM Creazioni
+                SELECT IDinserzione
+                FROM INSERZIONE
                 """;
 
         try (PreparedStatement statement = DAOUtils.prepare(connection, query);
@@ -142,8 +142,8 @@ public final class DBModel implements Model {
     public List<Integer> getAllSubcategoryIds() {
         List<Integer> subcategoryIds = new ArrayList<>();
         String query = """
-                SELECT IDsubcategoria
-                FROM Subcategorie
+                SELECT IDsottocategoria
+                FROM SOTTOCATEGORIA
                 """;
 
         try (PreparedStatement statement = DAOUtils.prepare(connection, query);
