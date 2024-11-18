@@ -170,8 +170,8 @@ public final class Queries {
                         """;
 
         public static final String USER_MODERATION = """
-                        INSERT INTO Moderazione (AdminName, Username, Tipo)
-                        VALUES (?, ?, ?);
+                        INSERT INTO Moderazione (AdminName, Username, dataModerazione, Tipo)
+                        VALUES (?, ?, CURDATE(), ?);
                         """;
 
         public static final String USER_REPORT_UPDATE = """
