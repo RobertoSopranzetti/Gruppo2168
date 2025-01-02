@@ -688,20 +688,12 @@ public final class View {
                 String creationInfo = String.format("%d. %s", rank, creation.name());
                 mainPanel.add(new JLabel(creationInfo));
                 mainPanel.add(new JLabel("Descrizione: " + creation.description()));
-                mainPanel.add(new JLabel("Forza: " + creation.strength()));
-                mainPanel.add(new JLabel("Destrezza: " + creation.dexterity()));
-                mainPanel.add(new JLabel("Costituzione: " + creation.constitution()));
-                mainPanel.add(new JLabel("Intelligenza: " + creation.intelligence()));
-                mainPanel.add(new JLabel("Saggezza: " + creation.wisdom()));
-                mainPanel.add(new JLabel("Carisma: " + creation.charisma()));
 
                 if (creation instanceof Character character) {
                     mainPanel.add(new JLabel("Classe: " + character.classType()));
                     mainPanel.add(new JLabel("Razza: " + character.race()));
-                    mainPanel.add(new JLabel("Livello: " + character.level()));
                 } else if (creation instanceof Monster monster) {
                     mainPanel.add(new JLabel("Taglia: " + monster.size()));
-                    mainPanel.add(new JLabel("Grado di Sfida: " + monster.challengeRating()));
                     mainPanel.add(new JLabel("Tipo: " + monster.type()));
                 }
 
